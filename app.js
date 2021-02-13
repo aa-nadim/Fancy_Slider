@@ -12,41 +12,60 @@ let sliders = [];
 // Find the name in the url and go to their website
 // to create your own api key
 const KEY = '15674931-a9d714b6e9d654524df198e00&q';
+// const KEY = '20264790-87d9b1d1e151743af3b96f775';
+
+
+document.getElementById("search")
+.addEventListener("keypress", function(event) {
+    if (event.key === 'Enter'){
+      document.getElementById("search-btn").click();
+    }  
+});
 
 // show images 
 const showImages = (images) => {
-  imagesArea.style.display = 'block';
-  gallery.innerHTML = '';
-  // show gallery title
-  galleryHeader.style.display = 'flex';
-  images.forEach(image => {
-    let div = document.createElement('div');
-    div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
-    div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
-    gallery.appendChild(div)
-  })
-
+    //console.log(images);
+    imagesArea.style.display = 'block';
+    gallery.innerHTML = '';
+    // show gallery title
+    galleryHeader.style.display = 'flex';
+    toggleSpinner();
+    images.forEach(image => {
+      let div = document.createElement('div');
+      div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
+      div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
+      gallery.appendChild(div)
+    })
+    
 }
-
 const getImages = (query) => {
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
-    .then(data => showImages(data.hitS))
-    .catch(err => console.log(err))
+    .then(data => showImages(data.hits))
+    toggleSpinner()
+    .catch(error => displayError('Something went Wrong!! Please try again!!!'))
 }
-
 let slideIndex = 0;
 const selectItem = (event, img) => {
   let element = event.target;
-  element.classList.add('added');
- 
   let item = sliders.indexOf(img);
   if (item === -1) {
+    element.classList.add('added');
     sliders.push(img);
-  } else {
-    alert('Hey, Already added !')
+  } 
+  else {
+    sliders.splice(item, 1);
+    element.classList.remove('added');
   }
 }
+
+document.getElementById("duration")
+.addEventListener("keypress", function(event) {
+    if (event.key === 'Enter'){
+      document.getElementById("create-slider").click();
+    }  
+});
+
 var timer
 const createSlider = () => {
   // check slider image length
@@ -68,6 +87,10 @@ const createSlider = () => {
   // hide image aria
   imagesArea.style.display = 'none';
   const duration = document.getElementById('duration').value || 1000;
+  if (duration < 0) {
+    alert('Duration can not be negative.')
+    return;
+  }
   sliders.forEach(slide => {
     let item = document.createElement('div')
     item.className = "slider-item";
@@ -90,22 +113,18 @@ const changeItem = index => {
 
 // change slide item
 const changeSlide = (index) => {
-
   const items = document.querySelectorAll('.slider-item');
   if (index < 0) {
     slideIndex = items.length - 1
     index = slideIndex;
   };
-
   if (index >= items.length) {
     index = 0;
     slideIndex = 0;
   }
-
   items.forEach(item => {
     item.style.display = "none"
   })
-
   items[index].style.display = "block"
 }
 
@@ -120,3 +139,14 @@ searchBtn.addEventListener('click', function () {
 sliderBtn.addEventListener('click', function () {
   createSlider()
 })
+
+
+const toggleSpinner = () => {
+  const spinner = document.getElementById('loading-spinner');
+  spinner.classList.toggle('d-lg-none');
+}
+
+const displayError = error =>{
+  const errorTag = document.getElementById('error-message')
+  errorTag.innerText = error;
+}
