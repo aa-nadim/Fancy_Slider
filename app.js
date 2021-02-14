@@ -140,12 +140,12 @@ sliderBtn.addEventListener('click', function () {
   createSlider()
 })
 
-
+//-- spinner --
 const toggleSpinner = () => {
   const spinner = document.getElementById('loading-spinner');
   spinner.classList.toggle('d-lg-none');
 }
-
+//-- Error Messages --
 const displayError = error =>{
   const errorTag = document.getElementById('error-message')
   errorTag.innerText = error;
